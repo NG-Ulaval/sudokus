@@ -163,6 +163,7 @@ class TableauSudoku:
 
     def is_solved(self, extra = True):
         if extra:
+            nb_bonne_reponse = 0
             for i in range(9):
                 for j in range(9):
                     name = self.name_case(i, j)
@@ -170,8 +171,10 @@ class TableauSudoku:
                     self.check_possibility(i, j)
 
                     if [str(self.cases[name].number)] == self.cases[name].possibility:
-
-                        return True
+                        nb_bonne_reponse += 1
+            if nb_bonne_reponse == 81:
+                return True
+            return False
 
         known_values = 0
         for i in self.cases.keys():

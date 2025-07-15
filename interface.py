@@ -17,7 +17,7 @@ class SudokuGrid:
 
         tk.Button(commandes, text="Résoudre", command=self.update_grid_values).pack(side=tk.LEFT, padx=10)
         tk.Button(commandes, text="Importer un exemple", command=self.import_sudoku).pack(side=tk.LEFT, padx=10)
-        tk.Button(commandes, text="Solution", command=self.verify_sudoku).pack(side=tk.LEFT, padx=10)
+        tk.Button(commandes, text="Vérification", command=self.verify_sudoku).pack(side=tk.LEFT, padx=10)
 
         # --- Grid frame ---
         grid_frame = tk.Frame(root, bg="black")  # black background to simulate bold lines

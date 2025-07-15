@@ -1,55 +1,77 @@
-from class_de_sudokus import Case, TableauSudoku
 import tkinter as tk
-
+from class_de_sudokus import Case, TableauSudoku
+import random
 class SudokuGrid:
-    def __init__(self, TableauSudoku):
-        self.master = TableauSudoku
-        TableauSudoku.title("9x9 Sudokus Grid")
+    def __init__(self, root):
+        self.master = root
 
-        self.entry_vars = []  # To store StringVar objects for each entry
-        self.entries = []  # To store Entry widgets
+        root.title("9x9 Sudokus Grid")
+        root.geometry('600x600')
+        root.resizable(False, False)
+        self.entry_vars = []
+        self.entries = []
+
+        # --- Top frame for buttons ---
+        commandes = tk.Frame(root)
+        commandes.pack(pady=10)
+
+        tk.Button(commandes, text="Résoudre", command=self.update_grid_values).pack(side=tk.LEFT, padx=10)
+        tk.Button(commandes, text="Importer un exemple", command=self.import_sudoku).pack(side=tk.LEFT, padx=10)
+        tk.Button(commandes, text="Solution", command=self.verify_sudoku).pack(side=tk.LEFT, padx=10)
+
+        # --- Grid frame ---
+        grid_frame = tk.Frame(root, bg="black")  # black background to simulate bold lines
+        grid_frame.pack(pady=10)
 
         for r in range(9):
             row_vars = []
             row_entries = []
             for c in range(9):
-                # Create a StringVar for each entry
-                var = tk.StringVar(TableauSudoku)
+                var = tk.StringVar()
+                entry = tk.Entry(width=3, font=("Arial", 18), justify="center", textvariable=var)
+
+                # Determine thickness of right and bottom borders
+                right_thickness = 3 if (c + 1) % 3 == 0 and c != 8 else 1
+                bottom_thickness = 3 if (r + 1) % 3 == 0 and r != 8 else 1
+
+                # Frame with only bottom and right thicker if on 3x3 boundary
+                cell_frame = tk.Frame(
+                    grid_frame,
+                    highlightbackground="black",
+                    highlightcolor="black",
+                    highlightthickness=0,
+                    bd=0
+                )
+                cell_frame.grid(row=r, column=c, sticky="nsew")
+
+                # Nested frame to simulate borders
+                border_frame = tk.Frame(
+                    cell_frame,
+                    bd=0,
+                    highlightbackground="black",
+                    highlightcolor="black",
+                    highlightthickness=1,
+                )
+                border_frame.pack(
+                    fill="both",
+                    expand=True,
+                    padx=(1, right_thickness),
+                    pady=(1, bottom_thickness)
+                )
+
+                entry.grid(in_=border_frame, row=0, column=0, padx=1, pady=1)
+
                 row_vars.append(var)
-
-                # Create an Entry widget and link it to the StringVar
-                entry = tk.Entry(TableauSudoku, textvariable=var, width=6, justify='center')
-                entry.grid(row=r + 1, column=c, padx=6, pady=6)
                 row_entries.append(entry)
-
-                # Add padding to create visual separation for 3x3 blocks
-
-                if (c + 1) % 3 == 0 and c != 8:
-                    entry.grid(padx=(1, 5))
-
             self.entry_vars.append(row_vars)
             self.entries.append(row_entries)
 
-            if (r + 1) % 3 == 0 and r != 8:
-                # Add padding to create visual separation for 3x3 blocks
-                TableauSudoku.grid_rowconfigure(r, pad=5)
+        # Set equal size for each cell
+        # for i in range(9):
+        #     grid_frame.grid_columnconfigure(i, weight=1)
+        #     grid_frame.grid_rowconfigure(i, weight=1)
 
-        ## Ajouter un bouton pour Résoudre le sudokus
-        tk.Button(
-            TableauSudoku, text="Résoudre", command=self.update_grid_values
-        ).grid(row=0, column=9, padx=6, pady=5)
-
-
-        # Ajouter un bouton pour importer un sudokus
-        tk.Button(
-            TableauSudoku, text="importer un exemple", command=self.import_sudoku
-        ).grid(row=0, column=10, padx=6, pady=5)
-
-        tk.Button(
-            TableauSudoku, text="Solution", command=self.verify_sudoku
-        ).grid(row=0, column=11, padx=6, pady=5)
     def get_grid_values(self):
-        """Retrieves the current values from all entry widgets."""
         grid_values = []
         for r in range(9):
             row_values = []
@@ -70,9 +92,9 @@ class SudokuGrid:
             for j in range(9):
                 self.entry_vars[i][j].set(mon_tableau.cases[mon_tableau.name_case(i, j)].number)
 
-
     def import_sudoku(self):
-        filepath = "exemple3.txt"
+        filepath_list = ["exemple1.txt", "exemple2.txt", "exemple3.txt"]
+        filepath = random.choice(filepath_list)
 
         with open(filepath, 'r') as file:
             lines = file.readlines()
@@ -89,12 +111,7 @@ class SudokuGrid:
 
             for j in range(9):
                 char = line[j]
-
-                if char in "123456789":
-                    self.entry_vars[i][j].set(char)
-                else:
-                    self.entry_vars[i][j].set("")
-
+                self.entry_vars[i][j].set(char if char in "123456789" else "")
 
         print("Puzzle loaded successfully.")
 
@@ -109,17 +126,9 @@ class SudokuGrid:
         else:
             print("Puzzle not solved.")
 
-# Example usage:
+
+# --- Main app entry ---
 if __name__ == "__main__":
     root = tk.Tk()
     grid_app = SudokuGrid(root)
-
-    # You can set initial values if needed
-    # grid_app.entry_vars[0][0].set("5")
-
-    # Example of retrieving values after user input
-    # def print_values():
-    #     print(grid_app.get_grid_values())
-    # tk.Button(root, text="Get Values", command=print_values).grid(row=9, columnspan=9)
-
     root.mainloop()

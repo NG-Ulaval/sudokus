@@ -1,26 +1,18 @@
-from encodings.punycode import selective_find
-from tkinter import Tk, Label, Button, Frame, Entry
+
+
 class Case:
     def __init__(self, number = ""):
         self.number = number
         self.possibility = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-
-    def verify_number(self):
-        # Vérifie si une seule valeur est possible
-        if len(self.possibility) == 1:
-            self.number = self.possibility[0]
 
     def number_known(self):
         if self.number in "123456789":
             self.possibility = [self.number]
 
 
-
 class TableauSudoku:
     def __init__(self):
-
         self.cases = {}
-        self.temporary_value = None
 
     def __repr__(self):
         return str(self.cases)
@@ -28,12 +20,6 @@ class TableauSudoku:
     def name_case(self, axe_x, axe_y):
         # return is name
         return f"{axe_x},{axe_y}"
-
-    def initialiser_les_cases(self):
-        # Crée toutes les cases du sudokus
-        for i in range(9):
-            for j in range(9):
-                self.cases[self.name_case(i,j)] = Case("")
 
     def ajouter_une_case(self, axe_x, axe_y, valeur):
         self.cases[self.name_case(axe_x, axe_y)] = Case(number = valeur)
@@ -43,9 +29,6 @@ class TableauSudoku:
     def changer_valeur_case(self, axe_x, axe_y, valeur):
         self.cases[self.name_case(axe_x,axe_y)].number = valeur
         self.cases[self.name_case(axe_x,axe_y)].number_known()
-
-    def changer_valeur_possible_case(self, axe_x, axe_y, a_enlever):
-        self.cases[self.name_case(axe_x,axe_y)].possibility.remove(a_enlever)
 
     def check_x_value(self, axe_x, axe_y):
         # Regarde les valeurs possibles de la cases sur l'axe des x
@@ -98,27 +81,23 @@ class TableauSudoku:
                 self.changer_valeur_case(axe_x, axe_y, number)
 
     def check_box_value(self, axe_x, axe_y):
-
         square_x = axe_x // 3 * 3
         square_y = axe_y // 3 * 3
-
         for number in self.cases[self.name_case(axe_x, axe_y)].possibility:
             conteur = 0
-
             for i in range(square_x, square_x + 3):
                 for j in range(square_y, square_y + 3):
                     if number not in self.cases[self.name_case(i, j)].possibility:
                         conteur += 1
-
             if conteur == 8:
                 try:
                     if self.cases[self.name_case(axe_x, axe_y)].number != "" and self.cases[self.name_case(axe_x, axe_y)].number != number:
                         raise Exception(f"nombre qui devrait être la valeur: {number}\n Nombre qui est la valeur: {self.cases[self.name_case(axe_x, axe_y)].number}")
                 except Exception:
                     "Deux valeurs possibles ... Il y a une erreur"
-
                 self.changer_valeur_case(axe_x, axe_y, number)
                 return
+
 
     def check_value(self, axe_x, axe_y):
         if len(self.cases[self.name_case(axe_x, axe_y)].possibility) != 1:
@@ -126,8 +105,7 @@ class TableauSudoku:
             self.check_y_value(axe_x, axe_y)
             self.check_box_value(axe_x, axe_y)
         else:
-            self.cases[self.name_case(axe_x, axe_y)].verify_number()
-
+            self.cases[self.name_case(axe_x, axe_y)].number = self.cases[self.name_case(axe_x, axe_y)].possibility[0]
 
     def check_every_value(self):
         for i in range(9):
@@ -135,25 +113,23 @@ class TableauSudoku:
                 self.check_value(i, j)
 
     def check_possibility(self, axe_x, axe_y):
-
         # Check x Value
         for i in range(9):
             if self.cases[self.name_case(axe_x, i)].number in self.cases[self.name_case(axe_x, axe_y)].possibility and i != axe_y:
-                self.changer_valeur_possible_case(axe_x, axe_y, self.cases[self.name_case(axe_x, i)].number)
+                self.cases[self.name_case(axe_x, axe_y)].possibility.remove(self.cases[self.name_case(axe_x, i)].number)
 
         # Check y value
         for j in range(9):
             if self.cases[self.name_case(j, axe_y)].number in self.cases[self.name_case(axe_x, axe_y)].possibility and j != axe_x:
-                self.changer_valeur_possible_case(axe_x, axe_y, self.cases[self.name_case(j, axe_y)].number)
+                self.cases[self.name_case(axe_x, axe_y)].possibility.remove(self.cases[self.name_case(j, axe_y)].number)
 
         # check square value
         square_x_ = axe_x //3 * 3
         square_y_ = axe_y //3 * 3
-
         for i in range(square_x_, square_x_ + 3):
             for j in range(square_y_, square_y_ + 3):
                 if self.cases[self.name_case(i, j)].number in self.cases[self.name_case(axe_x, axe_y)].possibility and (i, j) != (axe_x, axe_y):
-                    self.changer_valeur_possible_case(axe_x, axe_y, self.cases[self.name_case(i, j)].number)
+                    self.cases[self.name_case(axe_x, axe_y)].possibility.remove(self.cases[self.name_case(i, j)].number)
 
     def check_every_possibility(self):
         for i in range(9):
@@ -250,19 +226,17 @@ class TableauSudoku:
                     return True
 
                 self.cases[self.name_case(axe_x, axe_y)].number = ""
-                # self.cases[self.name_case(axe_x, axe_y)].possibility = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
         return False
 
     def solve_sudoku(self):
         self.normal_solve()
 
-        print(self.is_solved())
         if self.is_solved():
             return
 
         print("solving sudoku with force")
         self.force_solve()
-        # if not self.is_solved():
-        #     raise Exception("Echec de force_solve, not correct sudoku")
+
 
 

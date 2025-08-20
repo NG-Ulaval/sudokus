@@ -66,10 +66,7 @@ class SudokuGrid:
             self.entry_vars.append(row_vars)
             self.entries.append(row_entries)
 
-        # Set equal size for each cell
-        # for i in range(9):
-        #     grid_frame.grid_columnconfigure(i, weight=1)
-        #     grid_frame.grid_rowconfigure(i, weight=1)
+
 
     def get_grid_values(self):
         grid_values = []

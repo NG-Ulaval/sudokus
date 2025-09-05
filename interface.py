@@ -4,6 +4,7 @@ import random
 class SudokuGrid:
     def __init__(self, root):
         self.master = root
+        self.example = 0
 
         root.title("9x9 Sudokus Grid")
         root.geometry('600x600')
@@ -90,8 +91,12 @@ class SudokuGrid:
                 self.entry_vars[i][j].set(mon_tableau.cases[mon_tableau.name_case(i, j)].number)
 
     def import_sudoku(self):
+
         filepath_list = ["exemple1.txt", "exemple2.txt", "exemple3.txt"]
-        filepath = random.choice(filepath_list)
+        filepath = filepath_list[self.example]
+        self.example += 1
+        if self.example > 2:
+            self.example = 0
 
         with open(filepath, 'r') as file:
             lines = file.readlines()
